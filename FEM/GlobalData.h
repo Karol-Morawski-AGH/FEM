@@ -5,29 +5,18 @@
 
 class GlobalData
 {
-public:
+	/*Height and width of the grid*/
 	double H, W;
+	/*Number of nodes (horizontally and vertically)*/
 	uint nH, nW;
-	//May be changed/removed
+	/*Number of nodes and elements*/
 	uint nN, nE;
-	
 
-	GlobalData() {
-		H = 0;
-		W = 0;
-		nH = 0;
-		nW = 0;
-	}
-
-	GlobalData(double Hc, double Wc, int nHc, int nWc) {
-		this->H = Hc;
-		this->W = Wc;
-		this->nH = nHc;
-		this->nW = nWc;
-		this->nN = nHc * nWc;
-		this->nE = (nHc - 1) * (nWc - 1);
-	}
-
+public:
+	/*Constructors*/
+	GlobalData();
+	GlobalData(double Hc, double Wc, int nHc, int nWc);
+	/*Print object info*/
 	void print();
 
 };

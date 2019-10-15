@@ -1,8 +1,21 @@
 #pragma once
+#include "config.h"
+#include<iostream>
+
 class Node
 {
-	double temp;
-	int x, y;
+	double t, x, y;
 	bool bc;
+
+public:
+
+	/*Constructors*/
+	Node();
+	Node(double x, double y, double temp, bool bc);
+
+	/*Print node info*/
+	void print();
+
+
 };
 
