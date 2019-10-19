@@ -32,10 +32,21 @@ Grid::Grid(GlobalData data)
 		}
 	}
 
-	//FIXME
 	/*Creating elements (4 nodes per element)*/
+	int k = 0;
 	for (int i = 0; i < nE; i++) {
-		Element* element = new Element(nodes[i], nodes[i + nH], nodes[i + nH + 1], nodes[i + 1]);
+
+		if ((i % nH) == (nH - 1)) {
+			nE++;
+			continue;
+		}
+
+		Node* a = nodes[i];
+		Node* b = nodes[i + 1];
+		Node* c = nodes[i + nH];
+		Node* d = nodes[i + nH + 1];
+
+		Element* element = new Element(a,b,c,d);
 		elements.push_back(element);
 	}
 
@@ -63,7 +74,7 @@ void Grid::print_nodes()
 void Grid::print_elements()
 {
 	for (int i = 0; i < elements.size(); i++) {
-		std::cout << i + 1 << ". ";
+		std::cout << i + 1 << ". " << std::endl;
 		elements[i]->print();
 		std::cout << std::endl;
 	}

@@ -15,5 +15,8 @@ public:
 
 	/*Print node info*/
 	void print();
+	void modify_test(double x) {
+		this->x = x;
+	}
 };
 

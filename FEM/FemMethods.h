@@ -13,3 +13,6 @@ std::vector<std::vector<std::string>> readCSV(std::string, char);
 //Casts vector of strings from readCSV() as doubles
 std::vector<std::vector<double>> doubleVector(std::vector<std::vector<std::string>>);
 
+//Gaussian quadrature v1
+double gauss_quad(double a, double b, int precision, double(*fun)(double));
+

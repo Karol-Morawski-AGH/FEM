@@ -1,4 +1,5 @@
 #include "Node.h"
+#include<iomanip>
 
 Node::Node()
 {
@@ -15,5 +16,5 @@ Node::Node(double xc, double yc, double tc, bool bcc)
 
 void Node::print()
 {
-	std::cout << "Node(" << this->x << "," << this->y << ") T = [" << this->t << "] BoundaryCondition = [" << this->bc << "]" << std::endl;
+	std::cout << std::fixed <<  std::setprecision(PRECISION_LEVEL) <<  "Node(" << this->x << "," << this->y << ")\tT = [" << this->t << "] BoundaryCondition = [" << this->bc << "]" << std::endl;
 }
