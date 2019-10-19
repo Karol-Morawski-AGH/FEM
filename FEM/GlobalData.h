@@ -19,5 +19,13 @@ public:
 	/*Print object info*/
 	void print();
 
+public:
+    double getH() const;
+    double getW() const;
+    uint getNH() const;
+    uint getNW() const;
+    uint getNN() const;
+    uint getNE() const;
+
 };
 

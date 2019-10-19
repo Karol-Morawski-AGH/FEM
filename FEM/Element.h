@@ -4,12 +4,19 @@
 #include<iostream>
 #include<vector>
 
-//tutaj sprawdzic bo nie wiadomo
+//Node*(?)
 class Element
 {
 	std::vector<Node*> id;
 public:
+	Element(Node *a, Node *b, Node *c, Node *d);
 
+	void print()
+	{
+		for (int i = 0; i < id.size(); i++) {
+			id[i]->print();
+		}
+	}
 
 };
 

@@ -15,7 +15,5 @@ public:
 
 	/*Print node info*/
 	void print();
-
-
 };
 
