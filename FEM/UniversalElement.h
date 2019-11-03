@@ -8,16 +8,15 @@ class UniversalElement
 	uint ipoint_q;								/*Number of integration points*/
 	uint node_q;								/*Number of nodes in element*/
 
-	std::vector<std::vector<double>> ksi_array;	/*Values of the partial shape functions with respect to ksi*/
-	std::vector<std::vector<double>> eta_array;	/*Values of the partial shape functions with respect to eta*/
+	double** ksi_array;							/*Values of the partial shape functions with respect to ksi*/
+	double** eta_array;							/*Values of the partial shape functions with respect to eta*/
 
-	std::vector<double> shape_vals;				/*Values of shape functions*/
-	std::vector<double> bc_tab;					/*Boundary condition or somethign*/
+	double ** shape_vals;						/*Values of shape functions*/
 
-	std::vector<IntegrationPoint> pc;			/*Integration points*/
-	std::vector<double> pc_w;
-
+	IntegrationPoint* pc;						/*Integration points*/
+	double* pc_w;					/*Wagi tego u góry*/
 
 public:
-	UniversalElement();
+	UniversalElement(uint nodeq, uint ipoint);
+	void print();
 };

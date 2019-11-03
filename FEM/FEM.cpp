@@ -5,6 +5,7 @@
 #include "config.h"
 #include "Element.h"
 #include "Grid.h"
+#include "UniversalElement.h"
 
 int main()
 {
@@ -13,7 +14,10 @@ int main()
 	GlobalData data(std::stod(input[1][0]), std::stod(input[1][1]), std::stoul(input[1][2]), std::stoul(input[1][3]));;
 	Grid* testGrid = new Grid(data);
 	//testGrid->print_nodes();
-	testGrid->print_elements();
+	//testGrid->print_elements();
+
+	UniversalElement* uel = new UniversalElement(4, 4);
+	uel->print();
 
 	delete testGrid;
 }
