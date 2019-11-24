@@ -96,7 +96,7 @@ void UniversalElement::print()
 	}
 
 	//Print ksi matrix
-	std::cout << std::endl << "ETA matrix:" << std::endl;
+	std::cout << std::endl << "KSI matrix:" << std::endl;
 	std::cout << "\t";
 	for (int i = 0; i < this->ipoint_q; i++) {
 		std::cout << "N" << i + 1 << "\t\t";

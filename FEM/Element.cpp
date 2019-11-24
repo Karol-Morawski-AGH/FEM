@@ -8,4 +8,30 @@ Element::Element(Node *a, Node *b, Node *c, Node *d)
 	id.push_back(d);
 }
 
+Node Element::getNode(int i)
+{
+	Node node = *id[i];
+	return node;
+}
+
+uint Element::getEdgeCount()
+{
+	return this->edge_with_bc_count;
+}
+
+uint* Element::getEdgeList()
+{
+	return this->edge_bc_list;
+}
+
+void Element::setEdgeCount(uint i)
+{
+	this->edge_with_bc_count = i;
+}
+
+void Element::updateEdgeList(uint index, uint value)
+{
+	this->edge_bc_list[index] = value;
+}
+
 

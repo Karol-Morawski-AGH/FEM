@@ -18,5 +18,6 @@ public:
 
 	void print_nodes();
 	void print_elements();
+	Element* getElement(int id);
 };
 

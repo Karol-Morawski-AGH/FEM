@@ -18,3 +18,8 @@ void Node::print()
 {
 	std::cout << std::fixed <<  std::setprecision(PRECISION_LEVEL) <<  "Node(" << this->x << "," << this->y << ")\tT = [" << this->t << "] BoundaryCondition = [" << this->bc << "]" << std::endl;
 }
+
+bool Node::getBC()
+{
+	return this->bc;
+}

@@ -1,7 +1,5 @@
 #include "Grid.h"
 
-//TODO boundary condition
-
 Grid::Grid(GlobalData data)
 {
 	double H = data.getH();
@@ -46,9 +44,15 @@ Grid::Grid(GlobalData data)
 		Node* c = nodes[i + nH];
 		Node* d = nodes[i + nH + 1];
 
+		//TODO
+		//Na tym etapie niepoprawne BC
 		Element* element = new Element(a,b,c,d);
 		elements.push_back(element);
+
 	}
+
+
+
 
 }
 
@@ -79,3 +83,9 @@ void Grid::print_elements()
 		std::cout << std::endl;
 	}
 }
+
+Element* Grid::getElement(int id)
+{
+	return elements[id];
+}
+
