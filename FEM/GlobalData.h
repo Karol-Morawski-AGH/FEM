@@ -1,6 +1,5 @@
 #pragma once
 #include "config.h"
-
 #include <iostream>
 
 class GlobalData
@@ -11,11 +10,25 @@ class GlobalData
 	uint nH, nW;
 	/*Number of nodes and elements*/
 	uint nN, nE;
+	/*Initial temperature*/
+	double mTbegin;
+	/*Duration of process*/
+	double mTime;
+	/*Time step*/
+	double mdTime;
+	/*Specific heat capacity*/
+	double mC;
+	/*Thermal conductivity coefficent*/
+	double mK;
+	/*Density of material*/
+	double mR;
 
 public:
 	/*Constructors*/
 	GlobalData();
-	GlobalData(double Hc, double Wc, int nHc, int nWc);
+	GlobalData(double , double , int , int, double, 
+		double, double, double, double, double);
+
 	/*Print object info*/
 	void print();
 
@@ -26,6 +39,8 @@ public:
     uint getNW() const;
     uint getNN() const;
     uint getNE() const;
+	double getTemp();
+	
 
 };
 

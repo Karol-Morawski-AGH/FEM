@@ -11,23 +11,27 @@
 //TODO project structure
 
 //Reading and setting GlobalData
-//std::vector<std::vector<std::string>> input = readCSV("input.txt");
-//GlobalData data(std::stod(input[1][0]), std::stod(input[1][1]), std::stoul(input[1][2]), std::stoul(input[1][3]));;
+std::vector<std::vector<std::string>> input = readCSV("input.txt", '\t');
+GlobalData data(std::stod(input[0][0]), std::stod(input[1][0]), std::stoul(input[2][0]), std::stoul(input[3][0]), std::stod(input[4][0]), std::stod(input[5][0]), std::stod(input[6][0]), std::stod(input[7][0]), std::stod(input[8][0]), std::stod(input[9][0]));
 
 int main()
 {
-	std::cout << "test" << std::endl;
-	/*
+	//data.print();
+
+
+
+
+	
 	Grid* grid = new Grid(data);
-	//grid->print_nodes();
+	grid->print_nodes();
 	grid->print_elements();
 
 	UniversalElement* uel = new UniversalElement(4, 4);
 	//uel->print();
-	*/
 
 
 
+	//TODO
 	/*
 	//Macierze globalne
 

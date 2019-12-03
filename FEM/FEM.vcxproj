@@ -152,7 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Element.cpp" />
-    <ClCompile Include="FEM.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="FemMethods.cpp" />
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Grid.cpp" />

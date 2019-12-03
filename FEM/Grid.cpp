@@ -8,7 +8,8 @@ Grid::Grid(GlobalData data)
 	uint nW = data.getNW();
 	uint nN = data.getNN();
 	uint nE = data.getNE();
-
+	double mTbegin = data.getTemp();
+	
 	/*Creating nodes*/
 	double xsegmnt = W / (nW-1);
 	double ysegmnt = H / (nH-1);
@@ -25,7 +26,7 @@ Grid::Grid(GlobalData data)
 			if (xgridref == 0 || ygridref == 0 || xgridref == W || ygridref == H)
 				bc = 1;
 
-			Node* node = new Node(xgridref, ygridref, 0, bc);
+			Node* node = new Node(xgridref, ygridref, mTbegin, bc);
 			nodes.push_back(node);
 		}
 	}
