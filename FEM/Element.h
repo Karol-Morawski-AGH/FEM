@@ -17,6 +17,7 @@ public:
 
 	void print()
 	{
+		std::cout << "BC edge list: (" << edge_bc_list[0] << ", " << edge_bc_list[1] << ") count: " << edge_with_bc_count << std::endl;
 		for (int i = 0; i < id.size(); i++) {
 			id[i]->print();
 		}

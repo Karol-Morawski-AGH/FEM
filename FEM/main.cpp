@@ -18,17 +18,13 @@ int main()
 {
 	//data.print();
 
-
-
-
-	
 	Grid* grid = new Grid(data);
-	grid->print_nodes();
-	grid->print_elements();
+	//grid->print_nodes();
+	//grid->print_elements();
 
 	UniversalElement* uel = new UniversalElement(4, 4);
 	//uel->print();
-
+	grid->print_elements();
 
 
 	//TODO
@@ -102,5 +98,5 @@ int main()
 	}
 	*/
 
-	//delete grid;
+	delete grid;
 }
