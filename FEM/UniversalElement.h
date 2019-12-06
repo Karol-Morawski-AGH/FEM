@@ -19,4 +19,9 @@ class UniversalElement
 public:
 	UniversalElement(uint nodeq, uint ipoint);
 	void print();
+
+	/*Getters and setters*/
+	double** getKsiMatrix() { return ksi_array; }
+	double** getEtaMatrix() { return eta_array; }
+	double** getSVMatrix()  {  return  shape_vals; }
 };

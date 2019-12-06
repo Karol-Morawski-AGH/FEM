@@ -22,12 +22,16 @@ class GlobalData
 	double mK;
 	/*Density of material*/
 	double mR;
+	/*Ambient temperature*/
+	double mTambient;
+	/*Heat exchange coefficent*/
+	double mConv;
 
 public:
 	/*Constructors*/
 	GlobalData();
 	GlobalData(double , double , int , int, double, 
-		double, double, double, double, double);
+		double, double, double, double, double, double, double);
 
 	/*Print object info*/
 	void print();

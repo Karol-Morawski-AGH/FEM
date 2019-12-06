@@ -10,7 +10,7 @@ GlobalData::GlobalData() {
 
 GlobalData::GlobalData(double Hc, double Wc, int nHc, int nWc,
 	double mTbeginc, double mTimec, double mdTimec, double mCc,
-	double mKc, double mRc) {
+	double mKc, double mRc, double mTambientc, double mConvc) {
 	//TODO Temp?
 	if (Hc == 0 || Wc == 0 || nHc == 0 || nWc == 0 || mTimec < 0 || mdTimec < 0) {
 		std::cout << "GlobalData loaded with incorrect values, check input" << std::endl;
@@ -28,6 +28,8 @@ GlobalData::GlobalData(double Hc, double Wc, int nHc, int nWc,
 	this->mC = mCc;
 	this->mK = mKc;
 	this->mR = mRc;
+	this->mTambient = mTambientc;
+	this->mConv = mConvc;
 }
 
 void GlobalData::print()

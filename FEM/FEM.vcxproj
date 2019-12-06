@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Element.cpp" />
+    <ClCompile Include="Jacobian.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="FemMethods.cpp" />
     <ClCompile Include="GlobalData.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="GlobalData.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="IntegrationPoint.h" />
+    <ClInclude Include="Jacobian.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="UniversalElement.h" />
   </ItemGroup>

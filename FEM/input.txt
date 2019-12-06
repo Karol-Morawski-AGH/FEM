@@ -1,10 +1,12 @@
-1.5	H		Wysokosc przekroju
-0.5	W		Szerokosc przekroju
-6	nH		Liczba wezlow po wysokosci
+0.1	H		Wysokosc przekroju
+0.1	W		Szerokosc przekroju
+4	nH		Liczba wezlow po wysokosci
 4	nW		Liczba wezlow po szerokosci
 100	mTbegin		Temperatura poczatkowa
-60	mTime		Czas procesu
-1	mdTime		Krok czasowy
+500	mTime		Czas procesu
+50	mdTime		Krok czasowy
 700	mC		Cieplo wlasciwe
 25	mK		Wspolczynnik przewodzenia ciepla
 7800	mR		Gestosc kg/m3
+1200	mTambient	Temperatura otoczenia
+300	mConv		Wspolczynnik wnikania ciepla
