@@ -25,11 +25,19 @@ int main()
 
 	UniversalElement* uel = new UniversalElement(4, 4);
 
-	double x[4] = { 0.0667, 0.0667, 0.1, 0.1 };
-	double y[4] = { 0.0667, 0.1, 0.0667, 0.1 };
+	double x[4] = { 0., 0.025, 0.025, 0.0 };
+	double y[4] = { 0., 0.0, 0.025, 0.025 };
 
 	Jacobian* jacobian = new Jacobian(x,y,0,*uel);
-	jacobian->print();
+	//jacobian->print();
+	/*
+	std::vector<std::vector<double>> tab = jacobian->getJacobian();
+	std::cout << tab[0][0] << std::endl;
+	std::cout << tab[0][1] << std::endl;
+	std::cout << tab[1][0] << std::endl;
+	std::cout << tab[1][1] << std::endl;
+	*/
+
 
 	//uel->print();
 	//grid->print_elements();
