@@ -20,5 +20,8 @@ public:
 	}
 
 	bool getBC();
+	double getX();
+	double getY();
+	double getTemp();
 };
 

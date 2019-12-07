@@ -20,9 +20,11 @@ int main()
 	//data.print();
 
 	Grid* grid = new Grid(data);
+	grid->compute(data.getSC(), data.getDensity(), data.getLambda(), data.getTimeStep());
 	//grid->print_nodes();
 	//grid->print_elements();
 
+	/*
 	UniversalElement* uel = new UniversalElement(4, 4);
 
 	double x[4] = { 0., 0.025, 0.025, 0.0 };
@@ -30,6 +32,7 @@ int main()
 
 	Jacobian* jacobian = new Jacobian(x,y,0,*uel);
 	//jacobian->print();
+	*/
 	/*
 	std::vector<std::vector<double>> tab = jacobian->getJacobian();
 	std::cout << tab[0][0] << std::endl;

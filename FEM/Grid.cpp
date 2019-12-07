@@ -148,3 +148,71 @@ void Grid::set_boundary_cond()
 	}
 }
 
+void Grid::compute(double specificHeat, double density, double alfa, double tstep)
+{
+	
+	
+	UniversalElement* uElem = new UniversalElement(4, 4);
+
+	
+	double dNdx[4];
+	double dNdy[4];
+	double coordX[4];
+	double coordY[4];
+	double initialTemp[4];
+	double tempInt = 0.;
+	double det = 0.;
+	double cMatrix;
+
+	double hLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+	double pLocal[4] = { 0.,0.,0.,0. };
+	// Iterates through each element (computing H and P)
+	for (int i = 0; i < this->elements.size(); i++) {
+		Element *localElement = this->getElement(i);
+
+
+		// Gets coordinates nad initial temperatures of nodes
+		for (int j = 0; j < 4; j++) {
+			Node localNode = localElement->getNode(j);
+			coordX[j] = localNode.getX();
+			coordY[j] = localNode.getY();
+			initialTemp[j] = localNode.getTemp();
+		}
+		
+		for (int j = 0; j < 4; j++) {
+			Jacobian *jacobian = new Jacobian(coordX, coordY, j, *uElem);
+			tempInt = 0.;
+
+			for (int k = 0; k < 4; k++) {
+				dNdx[k] = jacobian->getInvertedJacobian()[0][0] * uElem->getSVMatrix()[j][k] 
+						+ jacobian->getInvertedJacobian()[0][1] * uElem->getSVMatrix()[j][k];
+
+				dNdy[k] = jacobian->getInvertedJacobian()[1][0] * uElem->getSVMatrix()[j][k]
+						+ jacobian->getInvertedJacobian()[1][1] * uElem->getSVMatrix()[j][k];
+
+				tempInt = tempInt + initialTemp[k] * uElem->getSVMatrix()[j][k];
+
+			}
+			
+			det = jacobian->getDet();
+
+			// N x N^T
+			for (int k = 0; k < 4; k++) {
+				for (int l = 0; l < 4; l++) {
+					cMatrix = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
+					double tempValue = hLocal[k][l] + alfa * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det + cMatrix/tstep;
+					hLocal[k][l] = tempValue;
+					pLocal[k] = pLocal[k] + cMatrix / tstep;
+				}
+			}
+
+
+		}
+		
+		
+
+	}
+		
+
+}
+

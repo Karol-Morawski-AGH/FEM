@@ -44,6 +44,10 @@ public:
     uint getNN() const;
     uint getNE() const;
 	double getTemp();
+	double getSC() { return this->mC; }
+	double getDensity() { return this->mR; }
+	double getLambda() { return this->mK; }
+	double getTimeStep() { return this->mdTime; }
 	
 
 };

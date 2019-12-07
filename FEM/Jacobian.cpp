@@ -8,8 +8,6 @@ Jacobian::Jacobian(double x[4], double y[4], int intPointId, UniversalElement uE
 	double** etaMatrix = uElem.getEtaMatrix();
 	double** ksiMatrix = uElem.getKsiMatrix();
 	
-	//uElem.print();
-
 	double dxDeta = 
 		  x[0] * etaMatrix[intPointId][0]
 		+ x[1] * etaMatrix[intPointId][1]
@@ -50,7 +48,7 @@ void Jacobian::print() {
 	std::cout << "Jacobian: " << std::endl;
 	std::cout << this->j_matrix[0][0] << "\t\t" << this->j_matrix[0][1] << "\n" << this->j_matrix[1][0] << "\t\t"  << this->j_matrix[1][1] << std::endl;
 
-	std::cout << "Inversed Jacobian: " << std::endl;
+	std::cout << "Inverted Jacobian: " << std::endl;
 	std::cout << this->j_matrix_inverted[0][0] << "\t\t" << this->j_matrix_inverted[0][1] << "\n" << this->j_matrix_inverted[1][0] << "\t\t" << this->j_matrix_inverted[1][1] << std::endl;
 
 }

@@ -23,3 +23,15 @@ bool Node::getBC()
 {
 	return this->bc;
 }
+
+double Node::getX() {
+	return this->x;
+}
+
+double Node::getY() {
+	return this->y;
+}
+
+double Node::getTemp() {
+	return this->t;
+}

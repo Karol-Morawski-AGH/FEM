@@ -17,4 +17,5 @@ public:
 	void print();
 	std::vector<std::vector<double>> getJacobian();
 	std::vector<std::vector<double>> getInvertedJacobian();
+	double getDet() { return this->det; }
 };

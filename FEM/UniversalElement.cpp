@@ -87,6 +87,17 @@ void UniversalElement::print()
 		std::cout << "P" << i+1 << " (" << pc[i].eta << ",\t" << pc[i].ksi << ")" << std::endl;
 	}
 	
+	//Print Shape functions values
+	std::cout << std::endl << "Shape functions matrix:" << std::endl;
+	std::cout << "\t";
+	for (int i = 0; i < this->ipoint_q; i++) {
+		std::cout << "N" << i + 1 << "\t\t";
+	}
+	std::cout << std::endl;
+	for (int i = 0; i < this->ipoint_q; i++) {
+		std::cout << "P" << i + 1 << "\t" << this->shape_vals[i][0] << "\t" << this->shape_vals[i][1] << "\t" << this->shape_vals[i][2] << "\t" << this->shape_vals[i][3] << std::endl;
+	}
+
 	//Print eta matrix
 	std::cout << std::endl << "ETA matrix:" << std::endl;
 	std::cout << "\t";

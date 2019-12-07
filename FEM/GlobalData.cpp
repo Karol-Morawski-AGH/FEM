@@ -73,3 +73,4 @@ double GlobalData::getTemp()
 	return this->mTbegin;
 }
 
+
