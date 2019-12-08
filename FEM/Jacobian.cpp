@@ -38,7 +38,7 @@ Jacobian::Jacobian(double x[4], double y[4], int intPointId, UniversalElement uE
 	this->det = (this->j_matrix[0][0] * this->j_matrix[1][1]) - (this->j_matrix[0][1] * this->j_matrix[1][0]);
 
 	//Setting up inversed Jacobian
-	this->j_matrix_inverted[0][0] = dyDeta/this->det;
+	this->j_matrix_inverted[0][0] = dyDeta/ this->det;
 	this->j_matrix_inverted[0][1] = -dyDksi / this->det;
 	this->j_matrix_inverted[1][0] = -dxDeta / this->det;
 	this->j_matrix_inverted[1][1] = dxDksi / this->det;
@@ -50,7 +50,6 @@ void Jacobian::print() {
 
 	std::cout << "Inverted Jacobian: " << std::endl;
 	std::cout << this->j_matrix_inverted[0][0] << "\t\t" << this->j_matrix_inverted[0][1] << "\n" << this->j_matrix_inverted[1][0] << "\t\t" << this->j_matrix_inverted[1][1] << std::endl;
-
 }
 
 std::vector<std::vector<double>> Jacobian::getJacobian()

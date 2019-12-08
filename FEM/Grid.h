@@ -24,6 +24,6 @@ public:
 	void print_elements();
 	Element* getElement(int id);
 	void set_boundary_cond();
-	void compute(double, double, double, double);
+	void compute(int, int, double, double, double, double);
 };
 

@@ -148,13 +148,30 @@ void Grid::set_boundary_cond()
 	}
 }
 
-void Grid::compute(double specificHeat, double density, double alfa, double tstep)
-{
-	
-	
+void Grid::compute(int nH, int nW, double specificHeat, double density, double lambda, double tstep)
+{	
 	UniversalElement* uElem = new UniversalElement(4, 4);
 
-	
+	//this->print_elements();
+
+	//Global H matrix
+	std::vector<double> pGlobal;
+	pGlobal.resize(nH * nW);
+	for (int i = 0; i < nH * nW; i++) {
+		pGlobal[i] = 0.0;
+	}
+
+	//Global P vector
+	std::vector<std::vector<double>> hGlobal;
+	hGlobal.resize(nH * nW);
+	for (int i = 0; i < nH * nW; i++) {
+		hGlobal[i].resize(nH * nW);
+		for (int j = 0; j < nH * nW; j++) {
+			hGlobal[i][j] = 0.0;
+		}
+	}
+
+
 	double dNdx[4];
 	double dNdy[4];
 	double coordX[4];
@@ -162,16 +179,18 @@ void Grid::compute(double specificHeat, double density, double alfa, double tste
 	double initialTemp[4];
 	double tempInt = 0.;
 	double det = 0.;
-	double cMatrix;
+	//double cMatrix[4][4];
 
+	//Local H matrix, P vector and C matrix
 	double hLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+	double cLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
 	double pLocal[4] = { 0.,0.,0.,0. };
 	// Iterates through each element (computing H and P)
 	for (int i = 0; i < this->elements.size(); i++) {
 		Element *localElement = this->getElement(i);
 
 
-		// Gets coordinates nad initial temperatures of nodes
+		// Gets all nodes parameters from element
 		for (int j = 0; j < 4; j++) {
 			Node localNode = localElement->getNode(j);
 			coordX[j] = localNode.getX();
@@ -179,40 +198,61 @@ void Grid::compute(double specificHeat, double density, double alfa, double tste
 			initialTemp[j] = localNode.getTemp();
 		}
 		
+		// Tworzy macierze jakobiego i wyznacza pochodne funkcji ksztaltu po x/y + interpolacja temp
 		for (int j = 0; j < 4; j++) {
-			Jacobian *jacobian = new Jacobian(coordX, coordY, j, *uElem);
+			Jacobian* jacobian = new Jacobian(coordX, coordY, j, *uElem);
 			tempInt = 0.;
 
 			for (int k = 0; k < 4; k++) {
-				dNdx[k] = jacobian->getInvertedJacobian()[0][0] * uElem->getSVMatrix()[j][k] 
-						+ jacobian->getInvertedJacobian()[0][1] * uElem->getSVMatrix()[j][k];
 
-				dNdy[k] = jacobian->getInvertedJacobian()[1][0] * uElem->getSVMatrix()[j][k]
-						+ jacobian->getInvertedJacobian()[1][1] * uElem->getSVMatrix()[j][k];
+				dNdx[k] = jacobian->getInvertedJacobian()[0][0] * uElem->getKsiMatrix()[j][k]
+						+ jacobian->getInvertedJacobian()[0][1] * uElem->getEtaMatrix()[j][k];
 
-				tempInt = tempInt + initialTemp[k] * uElem->getSVMatrix()[j][k];
+				dNdy[k] = jacobian->getInvertedJacobian()[1][0] * uElem->getKsiMatrix()[j][k]
+						+ jacobian->getInvertedJacobian()[1][1] * uElem->getEtaMatrix()[j][k];
 
 			}
-			
-			det = jacobian->getDet();
+				//FIXME
+				det = jacobian->getDet();
 
-			// N x N^T
-			for (int k = 0; k < 4; k++) {
-				for (int l = 0; l < 4; l++) {
-					cMatrix = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
-					double tempValue = hLocal[k][l] + alfa * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det + cMatrix/tstep;
-					hLocal[k][l] = tempValue;
-					pLocal[k] = pLocal[k] + cMatrix / tstep;
+				// N x N^T
+				// Calka objetosciowa do H i C
+				for (int k = 0; k < 4; k++) {
+					for (int l = 0; l < 4; l++) {
+						cLocal[k][l] = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
+						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;// +cLocal[k][l] / tstep;
+
+					    // demo
+						if (i == 4) {
+							std::cout << hLocal[k][l] << std::endl;
+						}
+
+						//hLocal[k][l] = 
+						/*
+						cMatrix = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
+						double tempValue = hLocal[k][l] + alfa * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det + cMatrix/tstep;
+						hLocal[k][l] = tempValue;
+						pLocal[k] = pLocal[k] + cMatrix / tstep;
+						*/
+					}
 				}
 			}
+		
 
 
+		//Calka powierzchniowa do H
+
+		//TODO
+		// Agregacja wynikow do macierzy globalnych H i P i C
+		for (int j = 0; j < 4; j++) {
+		
+			for (int k = 0; k < 4; k++) {
+
+			}
 		}
-		
-		
-
 	}
-		
+
+
 
 }
 
