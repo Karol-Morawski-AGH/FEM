@@ -7,6 +7,7 @@
 #include<vector>
 #include "Jacobian.h"
 #include "UniversalElement.h"
+#include <math.h>
 
 class Grid
 {
@@ -24,6 +25,6 @@ public:
 	void print_elements();
 	Element* getElement(int id);
 	void set_boundary_cond();
-	void compute(int, int, double, double, double, double);
+	void compute(int, int, double, double, double, double, double, double);
 };
 

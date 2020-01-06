@@ -148,8 +148,8 @@ void Grid::set_boundary_cond()
 	}
 }
 
-void Grid::compute(int nH, int nW, double specificHeat, double density, double lambda, double tstep)
-{	
+void Grid::compute(int nH, int nW, double specificHeat, double density, double lambda, double tstep, double alfa, double t_ambient)
+{
 	UniversalElement* uElem = new UniversalElement(4, 4);
 
 	//this->print_elements();
@@ -183,12 +183,12 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 
 	//Local H matrix, P vector and C matrix
 	double hLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+	double hsLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
 	double cLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
 	double pLocal[4] = { 0.,0.,0.,0. };
 	// Iterates through each element (computing H and P)
 	for (int i = 0; i < this->elements.size(); i++) {
 		Element *localElement = this->getElement(i);
-
 
 		// Gets all nodes parameters from element
 		for (int j = 0; j < 4; j++) {
@@ -212,38 +212,86 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						+ jacobian->getInvertedJacobian()[1][1] * uElem->getEtaMatrix()[j][k];
 
 			}
-				//FIXME
+
 				det = jacobian->getDet();
 
 				// N x N^T
 				// Calka objetosciowa do H i C
 				for (int k = 0; k < 4; k++) {
 					for (int l = 0; l < 4; l++) {
+						// C lokalne - OK
 						cLocal[k][l] = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
+						// H lokalne - OK 
 						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;// +cLocal[k][l] / tstep;
-
-					    // demo
-						if (i == 4) {
-							std::cout << hLocal[k][l] << std::endl;
-						}
-
-						//hLocal[k][l] = 
-						/*
-						cMatrix = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
-						double tempValue = hLocal[k][l] + alfa * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det + cMatrix/tstep;
-						hLocal[k][l] = tempValue;
-						pLocal[k] = pLocal[k] + cMatrix / tstep;
-						*/
 					}
 				}
 			}
 		
+		// TODO
+		/*
+		for (int k = 0; k < 4; k++) {
+			for (int l = 0; l < 4; l++) {
+				// demo
+				if (i == 4) {
+					std::cout << hLocal[k][l] << std::endl;
+				}
+			}
+		}
+		*/
 
+		//Calka powierzchniowa do H i wektor P
+		for (int n_surf = 0; n_surf < localElement->getEdgeCount(); n_surf++) {
+			
+			//FIXME 
+			uint surface_id = localElement->getEdgeList()[n_surf];
+			double edge_length, surf_det, x_cords[4], y_cords[4], shape_func[2];;
 
-		//Calka powierzchniowa do H
+			// Wspolrzedne elementu skonczonego
+			for (int cords = 0; cords < 4; cords++) {
+				x_cords[cords] = localElement->getNode(cords).getX();
+				y_cords[cords] = localElement->getNode(cords).getY();
+			}
 
-		//TODO
-		// Agregacja wynikow do macierzy globalnych H i P i C
+			// Obliczanie dlugosci boku
+			// Kolejnosc jest najprawdopodobniej zla, ale wystarczy podmienic indeksy (sal 1)
+			if (surface_id == 0) {
+				edge_length = sqrt(pow((x_cords[1]-x_cords[0]), 2) + pow((y_cords[1] - y_cords[0]),2));
+			}
+			else if (surface_id == 1) {
+				edge_length = sqrt(pow((x_cords[1] - x_cords[2]), 2) + pow((y_cords[1] - y_cords[2]), 2));
+			}
+			else if (surface_id == 2) {
+				edge_length = sqrt(pow((x_cords[2] - x_cords[3]), 2) + pow((y_cords[2] - y_cords[3]), 2));
+			}
+			else {
+				edge_length = sqrt(pow((x_cords[3] - x_cords[0]), 2) + pow((y_cords[3] - y_cords[0]), 2));
+			}
+
+			// lokalny wyznacznik macierzy jakobiego
+			surf_det = edge_length / 2.;
+
+			// Dla 2 pkt calkowania
+			for (int i_point = 0; i_point < 2; i_point++) {
+				for (int j = 0; j < 4; j++) {
+					for (int k = 0; k < 4; k++) {
+						// TODO
+						// Wartosci funkcji ksztaltu dla scian powierzchniowych
+						shape_func[0] = 0.0;
+						shape_func[1] = 0.0;
+
+						// Macierz H po powierzchni
+						hsLocal[j][k] += alfa * shape_func[0] * shape_func[1] * surf_det;
+					}
+					pLocal[j] += alfa * shape_func[0] * surf_det * t_ambient;
+				}
+
+			}
+
+		}
+
+		// TODO 
+		// Dodac hLocal i hsLocal
+		// Agregacja do macierzy wynikowej hlocal+hslocal plocal i clocal
 		for (int j = 0; j < 4; j++) {
 		
 			for (int k = 0; k < 4; k++) {

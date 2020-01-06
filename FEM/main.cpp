@@ -20,7 +20,7 @@ int main()
 	//data.print();
 
 	Grid* grid = new Grid(data);
-	grid->compute(data.getNH(), data.getNW(), data.getSC(), data.getDensity(), data.getLambda(), data.getTimeStep());
+	grid->compute(data.getNH(), data.getNW(), data.getSC(), data.getDensity(), data.getLambda(), data.getTimeStep(), data.getMConv(), data.getAmbientT());
 
 
 	delete grid;
