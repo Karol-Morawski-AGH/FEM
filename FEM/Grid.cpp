@@ -102,7 +102,7 @@ void Grid::set_boundary_cond()
 		//zalozmy ze od boku dolnego counterclockwise do boku lewego
 		//1-dolny, 2-prawy, 3-gorny, 4-lewy
 		//bok dolny
-		if (node_stat[0] == 1 && node_stat[1] == 1) {
+		if (node_stat[0] == 1 && node_stat[2] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 1);
 				element->setEdgeCount(1);
@@ -113,7 +113,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok prawy
-		if (node_stat[1] == 1 && node_stat[2] == 1) {
+		if (node_stat[2] == 1 && node_stat[3] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 2);
 				element->setEdgeCount(1);
@@ -124,7 +124,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok gorny
-		if (node_stat[2] == 1 && node_stat[3] == 1) {
+		if (node_stat[1] == 1 && node_stat[3] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 3);
 				element->setEdgeCount(1);
@@ -135,7 +135,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok lewy
-		if (node_stat[3] == 1 && node_stat[4] == 1) {
+		if (node_stat[1] == 1 && node_stat[0] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 4);
 				element->setEdgeCount(1);
@@ -186,6 +186,7 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 	double hsLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
 	double cLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
 	double pLocal[4] = { 0.,0.,0.,0. };
+
 	// Iterates through each element (computing H and P)
 	for (int i = 0; i < this->elements.size(); i++) {
 		Element *localElement = this->getElement(i);
@@ -228,23 +229,21 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 			}
 		
 		// TODO
-		/*
 		for (int k = 0; k < 4; k++) {
 			for (int l = 0; l < 4; l++) {
 				// demo
 				if (i == 4) {
-					std::cout << hLocal[k][l] << std::endl;
+					//std::cout << cLocal[k][l] << std::endl;
 				}
 			}
 		}
-		*/
 
 		//Calka powierzchniowa do H i wektor P
 		for (int n_surf = 0; n_surf < localElement->getEdgeCount(); n_surf++) {
-			
+
 			//FIXME 
 			uint surface_id = localElement->getEdgeList()[n_surf];
-			double edge_length, surf_det, x_cords[4], y_cords[4], shape_func[2];;
+			double edge_length, surf_det, x_cords[4], y_cords[4], shape_func[4], ksi, eta;
 
 			// Wspolrzedne elementu skonczonego
 			for (int cords = 0; cords < 4; cords++) {
@@ -253,51 +252,107 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 			}
 
 			// Obliczanie dlugosci boku
-			// Kolejnosc jest najprawdopodobniej zla, ale wystarczy podmienic indeksy (sal 1)
-			if (surface_id == 0) {
+			if (surface_id == 1) {
 				edge_length = sqrt(pow((x_cords[1]-x_cords[0]), 2) + pow((y_cords[1] - y_cords[0]),2));
 			}
-			else if (surface_id == 1) {
+			else if (surface_id == 2) {
 				edge_length = sqrt(pow((x_cords[1] - x_cords[2]), 2) + pow((y_cords[1] - y_cords[2]), 2));
 			}
-			else if (surface_id == 2) {
+			else if (surface_id == 3) {
 				edge_length = sqrt(pow((x_cords[2] - x_cords[3]), 2) + pow((y_cords[2] - y_cords[3]), 2));
 			}
-			else {
+			else if (surface_id==4) {
 				edge_length = sqrt(pow((x_cords[3] - x_cords[0]), 2) + pow((y_cords[3] - y_cords[0]), 2));
 			}
 
 			// lokalny wyznacznik macierzy jakobiego
 			surf_det = edge_length / 2.;
 
+			shape_func[0] = 0.;
+			shape_func[1] = 0.;
+			shape_func[2] = 0.;
+			shape_func[3] = 0.;
 			// Dla 2 pkt calkowania
 			for (int i_point = 0; i_point < 2; i_point++) {
 				for (int j = 0; j < 4; j++) {
 					for (int k = 0; k < 4; k++) {
-						// TODO
-						// Wartosci funkcji ksztaltu dla scian powierzchniowych
-						shape_func[0] = 0.0;
-						shape_func[1] = 0.0;
+
+						// mala zlozonosc cyklomatyczna
+						if (surface_id == 1) {
+							if (i_point == 0) {
+								eta = -1. / sqrt(3);
+								ksi = -1;
+							}
+							else {
+								eta = 1. / sqrt(3);
+								ksi = -1;
+							}
+							// N1 + N2
+							shape_func[0] = 0.25 * (1 - eta) * (1 - ksi);
+							shape_func[1] = 0.25 * (1 + eta) * (1 - ksi);
+							shape_func[2] = 0.;
+							shape_func[3] = 0.;
+						}
+						else if (surface_id == 2) {
+							if (i_point == 0) {
+								eta = 1;
+								ksi = -1. / sqrt(3);
+							}
+							else {
+								eta = 1;
+								ksi = 1. / sqrt(3);
+							}
+							// N2 + //N3
+							shape_func[0] = 0.;
+							shape_func[1] = 0.25 * (1 + eta) * (1 - ksi);
+							shape_func[2] = 0.25 * (1 + eta) * (1 + ksi);
+							shape_func[3] = 0.;
+
+						}
+						else if (surface_id == 3) {
+							if (i_point == 0) {
+								eta = 1. / sqrt(3);
+								ksi = 1;
+							}
+							else {
+								eta = -1. / sqrt(3);
+								ksi = 1;
+							}
+							// N3 + //N4
+							shape_func[0] = 0.;
+							shape_func[1] = 0.;
+							shape_func[2] = 0.25 * (1 + eta) * (1 + ksi);
+							shape_func[3] = 0.25 * (1 - eta) * (1 + ksi);
+						}
+						else {
+							if (i_point == 0) {
+								eta = -1;
+								ksi = 1. / sqrt(3);
+							}
+							else {
+								eta = -1;
+								ksi = -1. / sqrt(3);
+							}
+							// N4 + N1
+							shape_func[3] = 0.25 * (1 - eta) * (1 + ksi);
+							shape_func[1] = 0.;
+							shape_func[2] = 0.;
+							shape_func[0] = 0.25 * (1 - eta) * (1 - ksi);
+						}
 
 						// Macierz H po powierzchni
-						hsLocal[j][k] += alfa * shape_func[0] * shape_func[1] * surf_det;
+						hsLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;
 					}
-					pLocal[j] += alfa * shape_func[0] * surf_det * t_ambient;
+					pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient;
 				}
-
 			}
-
 		}
+
+
 
 		// TODO 
 		// Dodac hLocal i hsLocal
 		// Agregacja do macierzy wynikowej hlocal+hslocal plocal i clocal
-		for (int j = 0; j < 4; j++) {
-		
-			for (int k = 0; k < 4; k++) {
-
-			}
-		}
 	}
 
 
