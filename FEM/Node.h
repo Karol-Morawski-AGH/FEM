@@ -4,6 +4,7 @@
 
 class Node
 {
+	uint id;
 	double t, x, y;
 	bool bc;
 
@@ -23,5 +24,7 @@ public:
 	double getX();
 	double getY();
 	double getTemp();
+	uint getId();
+	void setId(uint);
 };
 

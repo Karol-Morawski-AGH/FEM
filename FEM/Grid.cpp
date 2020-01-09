@@ -1,4 +1,5 @@
 #include "Grid.h"
+#include<iomanip>
 
 Grid::Grid(GlobalData data)
 {
@@ -16,6 +17,7 @@ Grid::Grid(GlobalData data)
 	
 	double xgridref = 0;
 	double ygridref = 0;
+	uint order_tracker = 1;
 
 	for (int x = 0; x < nW; x++) {
 		xgridref = x * xsegmnt;
@@ -27,7 +29,9 @@ Grid::Grid(GlobalData data)
 				bc = 1;
 
 			Node* node = new Node(xgridref, ygridref, mTbegin, bc);
+			node->setId(order_tracker);
 			nodes.push_back(node);
+			order_tracker++;
 		}
 	}
 
@@ -48,6 +52,7 @@ Grid::Grid(GlobalData data)
 		//TODO
 		//Na tym etapie niepoprawne BC
 		Element* element = new Element(a,b,c,d);
+		element->setNodeOrder();
 		elements.push_back(element);
 
 	}
@@ -154,14 +159,14 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 
 	//this->print_elements();
 
-	//Global H matrix
+	//Global P vector
 	std::vector<double> pGlobal;
 	pGlobal.resize(nH * nW);
 	for (int i = 0; i < nH * nW; i++) {
 		pGlobal[i] = 0.0;
 	}
 
-	//Global P vector
+	//Global H matrix
 	std::vector<std::vector<double>> hGlobal;
 	hGlobal.resize(nH * nW);
 	for (int i = 0; i < nH * nW; i++) {
@@ -171,6 +176,15 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 		}
 	}
 
+	// Global C matrix
+	std::vector<std::vector<double>> cGlobal;
+	cGlobal.resize(nH * nW);
+	for (int i = 0; i < nH * nW; i++) {
+		cGlobal[i].resize(nH * nW);
+		for (int j = 0; j < nH * nW; j++) {
+			cGlobal[i][j] = 0.0;
+		}
+	}
 
 	double dNdx[4];
 	double dNdy[4];
@@ -223,20 +237,11 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						// C lokalne - OK
 						cLocal[k][l] = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
 						// H lokalne - OK 
-						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;// +cLocal[k][l] / tstep;
+						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det; // cLocal[k][l] / tstep;
 					}
 				}
 			}
 		
-		// TODO
-		for (int k = 0; k < 4; k++) {
-			for (int l = 0; l < 4; l++) {
-				// demo
-				if (i == 4) {
-					//std::cout << cLocal[k][l] << std::endl;
-				}
-			}
-		}
 
 		//Calka powierzchniowa do H i wektor P
 		for (int n_surf = 0; n_surf < localElement->getEdgeCount(); n_surf++) {
@@ -348,14 +353,54 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 			}
 		}
 
+		// Agregacja
+		for (int a = 0; a < 4; a++) {
+			for (int b = 0; b < 4; b++) {
+				// Indeks i
+				uint i_index = localElement->getNodeOrder()[a]-1;
+				// Indeks j
+				uint j_index = localElement->getNodeOrder()[b]-1;
+				// Dodanie do tablic globalnych
+				
+				// Dodawanie do H globalnej
+				hGlobal[i_index][j_index] += hLocal[a][b];
+				// Dodawanie do C globalnej
+				cGlobal[i_index][j_index] += cLocal[a][b];
+				
+			}
+			// Dodawanie do P globalnego
+			pGlobal[localElement->getNodeOrder()[a] - 1] += pLocal[a];
+		}
 
-
-		// TODO 
-		// Dodac hLocal i hsLocal
-		// Agregacja do macierzy wynikowej hlocal+hslocal plocal i clocal
 	}
-
-
+	//TODO USUNAC
+	// Wypisywanie tablic
+	std::cout << std::setprecision(2) << std::fixed;
+	std::cout << "MACIERZ H" << std::endl;
+	for (int a = 0; a < 16; a++) {
+		for (int b = 0; b < 16; b++) {
+			printf("%.3f ", hGlobal[a][b]);
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << "MACIERZ C" << std::endl;
+	for (int a = 0; a < 16; a++) {
+		for (int b = 0; b < 16; b++) {
+			printf("%.3f ", cGlobal[a][b]);
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << "WEKTOR P" << std::endl;
+	for (int a = 0; a < 16; a++) {
+		printf("%.3f ", pGlobal[a]);
+	}
+	std::cout << std::endl;
 
 }
 

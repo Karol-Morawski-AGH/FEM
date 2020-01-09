@@ -10,6 +10,7 @@ class Element
 	std::vector<Node*> id;
 	uint edge_with_bc_count = 0;
 	uint edge_bc_list[2] = { 0,0 };
+	uint node_order[4] = { 0,0,0,0 };
 public:
 
 	Element();
@@ -26,9 +27,11 @@ public:
 	Node getNode(int i);
 	uint getEdgeCount();
 	uint* getEdgeList();
+	uint* getNodeOrder();
 
 	void setEdgeCount(uint i);
 	void updateEdgeList(uint index, uint value);
+	void setNodeOrder();
 
 };
 

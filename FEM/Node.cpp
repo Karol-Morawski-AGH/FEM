@@ -12,11 +12,12 @@ Node::Node(double xc, double yc, double tc, bool bcc)
 	this->y = yc;
 	this->t = tc;
 	this->bc = bcc;
+	this->id = 0;
 }
 
 void Node::print()
 {
-	std::cout << std::fixed <<  std::setprecision(PRECISION_LEVEL) <<  "Node(" << this->x << "," << this->y << ")\tT = [" << this->t << "] BoundaryCondition = [" << this->bc << "]" << std::endl;
+	std::cout << std::fixed <<  std::setprecision(PRECISION_LEVEL) <<  "Node[" << this->id << "] (" << this->x << "," << this->y << ")\tT = [" << this->t << "] BoundaryCondition = [" << this->bc << "]" << std::endl;
 }
 
 bool Node::getBC()
@@ -34,4 +35,14 @@ double Node::getY() {
 
 double Node::getTemp() {
 	return this->t;
+}
+
+uint Node::getId()
+{
+	return this->id;
+}
+
+void Node::setId(uint id)
+{
+	this->id = id;
 }
