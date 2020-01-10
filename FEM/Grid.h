@@ -16,6 +16,10 @@ class Grid
 	std::vector<double> globalP;
 	std::vector<double> globalH;
 
+	std::vector<double> pGlobal;
+	std::vector<std::vector<double>> hGlobal;
+	std::vector<std::vector<double>> cGlobal;
+
 public:
 	Grid(GlobalData data);
 	Grid();
@@ -26,5 +30,9 @@ public:
 	Element* getElement(int id);
 	void set_boundary_cond();
 	void compute(int, int, double, double, double, double, double, double);
+	std::vector<Node*> getNodes() { return nodes; }
+	std::vector<std::vector<double>> getHGlobal() { return this->hGlobal; }
+	std::vector<double> getPGlobal() { return this->pGlobal; }
+	
 };
 

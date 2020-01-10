@@ -26,5 +26,6 @@ public:
 	double getTemp();
 	uint getId();
 	void setId(uint);
+	void setTemp(double);
 };
 

@@ -1,5 +1,6 @@
 #include "Grid.h"
 #include<iomanip>
+#include "config.h"
 
 Grid::Grid(GlobalData data)
 {
@@ -35,6 +36,7 @@ Grid::Grid(GlobalData data)
 		}
 	}
 
+
 	/*Creating elements (4 nodes per element)*/
 	int k = 0;
 	for (int i = 0; i < nE; i++) {
@@ -45,9 +47,10 @@ Grid::Grid(GlobalData data)
 		}
 
 		Node* a = nodes[i];
-		Node* b = nodes[i + 1];
-		Node* c = nodes[i + nH];
-		Node* d = nodes[i + nH + 1];
+		Node* b = nodes[i + nH];
+		Node* c = nodes[i + nH + 1];
+		Node* d = nodes[i + 1];
+
 
 		//TODO
 		//Na tym etapie niepoprawne BC
@@ -157,32 +160,29 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 {
 	UniversalElement* uElem = new UniversalElement(4, 4);
 
-	//this->print_elements();
+	/*Setting up global matrixes and vector*/
 
 	//Global P vector
-	std::vector<double> pGlobal;
-	pGlobal.resize(nH * nW);
+	this->pGlobal.resize(nH * nW);
 	for (int i = 0; i < nH * nW; i++) {
-		pGlobal[i] = 0.0;
+		this->pGlobal[i] = 0.0;
 	}
 
 	//Global H matrix
-	std::vector<std::vector<double>> hGlobal;
-	hGlobal.resize(nH * nW);
+	this->hGlobal.resize(nH * nW);
 	for (int i = 0; i < nH * nW; i++) {
-		hGlobal[i].resize(nH * nW);
+		this->hGlobal[i].resize(nH * nW);
 		for (int j = 0; j < nH * nW; j++) {
-			hGlobal[i][j] = 0.0;
+			this->hGlobal[i][j] = 0.0;
 		}
 	}
 
 	// Global C matrix
-	std::vector<std::vector<double>> cGlobal;
-	cGlobal.resize(nH * nW);
+	this->cGlobal.resize(nH * nW);
 	for (int i = 0; i < nH * nW; i++) {
-		cGlobal[i].resize(nH * nW);
+		this->cGlobal[i].resize(nH * nW);
 		for (int j = 0; j < nH * nW; j++) {
-			cGlobal[i][j] = 0.0;
+			this->cGlobal[i][j] = 0.0;
 		}
 	}
 
@@ -219,13 +219,13 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 			tempInt = 0.;
 
 			for (int k = 0; k < 4; k++) {
-
 				dNdx[k] = jacobian->getInvertedJacobian()[0][0] * uElem->getKsiMatrix()[j][k]
 						+ jacobian->getInvertedJacobian()[0][1] * uElem->getEtaMatrix()[j][k];
 
 				dNdy[k] = jacobian->getInvertedJacobian()[1][0] * uElem->getKsiMatrix()[j][k]
 						+ jacobian->getInvertedJacobian()[1][1] * uElem->getEtaMatrix()[j][k];
 
+				tempInt += initialTemp[k] * uElem->getSVMatrix()[j][k];
 			}
 
 				det = jacobian->getDet();
@@ -234,10 +234,12 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 				// Calka objetosciowa do H i C
 				for (int k = 0; k < 4; k++) {
 					for (int l = 0; l < 4; l++) {
-						// C lokalne - OK
+						// C lokalne
 						cLocal[k][l] = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
-						// H lokalne - OK 
-						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det; // cLocal[k][l] / tstep;
+						// H lokalne 
+						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;// +(cLocal[k][l] / tstep);
+						// P lokalnie
+						pLocal[k] += cLocal[k][l] / tstep * tempInt;
 					}
 				}
 			}
@@ -346,12 +348,13 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						}
 
 						// Macierz H po powierzchni
-						hsLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;
+						hLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;
 					}
 					pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient;
 				}
 			}
 		}
+
 
 		// Agregacja
 		for (int a = 0; a < 4; a++) {
@@ -361,46 +364,49 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 				// Indeks j
 				uint j_index = localElement->getNodeOrder()[b]-1;
 				// Dodanie do tablic globalnych
-				
 				// Dodawanie do H globalnej
-				hGlobal[i_index][j_index] += hLocal[a][b];
+				this->hGlobal[i_index][j_index] += hLocal[a][b];
 				// Dodawanie do C globalnej
-				cGlobal[i_index][j_index] += cLocal[a][b];
-				
+				this->cGlobal[i_index][j_index] += cLocal[a][b];
 			}
 			// Dodawanie do P globalnego
-			pGlobal[localElement->getNodeOrder()[a] - 1] += pLocal[a];
+			this->pGlobal[localElement->getNodeOrder()[a]-1] += pLocal[a];
 		}
-
 	}
-	//TODO USUNAC
+
+	// H + C/dT
+	for (int a = 0; a < this->hGlobal.size(); a++) {
+		for (int b = 0; b < this->hGlobal.size(); b++) {
+			hGlobal[a][b] += cGlobal[a][b] / tstep;
+		}
+	}
+
+
 	// Wypisywanie tablic
-	std::cout << std::setprecision(2) << std::fixed;
-	std::cout << "MACIERZ H" << std::endl;
-	for (int a = 0; a < 16; a++) {
-		for (int b = 0; b < 16; b++) {
-			printf("%.3f ", hGlobal[a][b]);
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << "MACIERZ C" << std::endl;
-	for (int a = 0; a < 16; a++) {
-		for (int b = 0; b < 16; b++) {
-			printf("%.3f ", cGlobal[a][b]);
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << "WEKTOR P" << std::endl;
-	for (int a = 0; a < 16; a++) {
-		printf("%.3f ", pGlobal[a]);
-	}
-	std::cout << std::endl;
 
+	if (print_global_arrays == true) {
+		std::cout << std::setprecision(2);
+		std::cout << "MACIERZ H" << std::endl;
+		for (int a = 0; a < 16; a++) {
+			for (int b = 0; b < 16; b++) {
+				printf("%.3f ", this->hGlobal[a][b]);
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+		std::cout << "MACIERZ C" << std::endl;
+		for (int a = 0; a < 16; a++) {
+			for (int b = 0; b < 16; b++) {
+				printf("%.3f ", this->cGlobal[a][b]);
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+		std::cout << "WEKTOR P" << std::endl;
+		for (int a = 0; a < 16; a++) {
+			printf("%.3f ", this->pGlobal[a]);
+		}
+		std::cout << std::endl;
+	}
 }
 

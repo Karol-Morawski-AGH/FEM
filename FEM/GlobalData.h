@@ -48,6 +48,7 @@ public:
 	double getDensity() { return this->mR; }
 	double getLambda() { return this->mK; }
 	double getTimeStep() { return this->mdTime; }
+	double getProcessTime() { return this->mTime; }
 	double getMConv() { return this->mConv; }
 	double getAmbientT() { return this->mTambient; }
 	

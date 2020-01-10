@@ -149,3 +149,52 @@ double gauss_quad(double a, double b, int precision, double(*fun)(double))
 
 	return result;
 }
+
+// Gaussian Elimination
+std::vector<double> gaussianElimination(std::vector<std::vector<double>> A, std::vector<double> B)
+{
+	std::vector<std::vector<double>> wx;
+	std::vector<std::vector<double>> wy;
+	std::vector<std::vector<double>> wz;
+
+	//Creates matrix which adds B vector as last column to A matrix
+	std::vector<std::vector<double>> matrix = A;
+
+	for (int i = 0; i < A.size(); i++) {
+		matrix[i].push_back(B[i]);
+	}
+
+	//Eliminatinon
+	int n = matrix.size();
+	for (int i = 0; i < n - 1; i++)
+		for (int k = i + 1; k < n; k++)
+		{
+			double t = matrix[k][i] / matrix[i][i];
+			for (int j = 0; j <= n; j++)
+				matrix[k][j] = matrix[k][j] - t * matrix[i][j];
+		}
+
+	//Calculating result vector
+	std::vector<double> results;
+
+	for (int i = 0; i < n; i++) {
+		results.push_back(0);
+	}
+	for (int i = n - 1; i >= 0; i--)
+	{
+		results[i] = matrix[i][n];
+		for (int j = i + 1; j < n; j++)
+			if (j != i)
+				results[i] = results[i] - matrix[i][j] * results[j];
+		results[i] = results[i] / matrix[i][i];
+	}
+
+	return results;
+}
+
+void gauss_display(std::vector<double> results) {
+
+	for (int i = 0; i < results.size(); i++) {
+		std::cout << "x" << i << ": " << results[i] << std::endl;
+	}
+}

@@ -46,3 +46,8 @@ void Node::setId(uint id)
 {
 	this->id = id;
 }
+
+void Node::setTemp(double temp)
+{
+	this->t = temp;
+}

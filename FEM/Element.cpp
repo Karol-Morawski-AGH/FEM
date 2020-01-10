@@ -41,10 +41,9 @@ void Element::updateEdgeList(uint index, uint value)
 
 void Element::setNodeOrder()
 {
-	this->node_order[0] = this->id[0]->getId(); 
-	this->node_order[1] = this->id[2]->getId();
-	this->node_order[2] = this->id[3]->getId();
-	this->node_order[3] = this->id[1]->getId();
+	for (int i = 0; i < 4; i++) {
+		this->node_order[i] = this->id[i]->getId();
+	}
 }
 
 
