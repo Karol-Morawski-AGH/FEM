@@ -107,10 +107,9 @@ void Grid::set_boundary_cond()
 			node_stat[j] = element->getNode(j).getBC();
 		}
 
-		//zalozmy ze od boku dolnego counterclockwise do boku lewego
 		//1-dolny, 2-prawy, 3-gorny, 4-lewy
 		//bok dolny
-		if (node_stat[0] == 1 && node_stat[2] == 1) {
+		if (node_stat[0] == 1 && node_stat[1] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 1);
 				element->setEdgeCount(1);
@@ -121,7 +120,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok prawy
-		if (node_stat[2] == 1 && node_stat[3] == 1) {
+		if (node_stat[1] == 1 && node_stat[2] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 2);
 				element->setEdgeCount(1);
@@ -132,7 +131,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok gorny
-		if (node_stat[1] == 1 && node_stat[3] == 1) {
+		if (node_stat[2] == 1 && node_stat[3] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 3);
 				element->setEdgeCount(1);
@@ -143,7 +142,7 @@ void Grid::set_boundary_cond()
 			}
 		}
 		//bok lewy
-		if (node_stat[1] == 1 && node_stat[0] == 1) {
+		if (node_stat[3] == 1 && node_stat[0] == 1) {
 			if (element->getEdgeCount() == 0) {
 				element->updateEdgeList(0, 4);
 				element->setEdgeCount(1);
@@ -195,14 +194,14 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 	double det = 0.;
 	//double cMatrix[4][4];
 
-	//Local H matrix, P vector and C matrix
-	double hLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
-	double hsLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
-	double cLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
-	double pLocal[4] = { 0.,0.,0.,0. };
-
 	// Iterates through each element (computing H and P)
 	for (int i = 0; i < this->elements.size(); i++) {
+		//Local H matrix, P vector and C matrix
+		double hLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+		double hsLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+		double cLocal[4][4] = { {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.}, {0.,0.,0.,0.} };
+		double pLocal[4] = { 0.,0.,0.,0. };
+
 		Element *localElement = this->getElement(i);
 
 		// Gets all nodes parameters from element
@@ -214,18 +213,19 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 		}
 		
 		// Tworzy macierze jakobiego i wyznacza pochodne funkcji ksztaltu po x/y + interpolacja temp
+		// J - punkt calkowania
 		for (int j = 0; j < 4; j++) {
 			Jacobian* jacobian = new Jacobian(coordX, coordY, j, *uElem);
 			tempInt = 0.;
-
 			for (int k = 0; k < 4; k++) {
+
 				dNdx[k] = jacobian->getInvertedJacobian()[0][0] * uElem->getKsiMatrix()[j][k]
 						+ jacobian->getInvertedJacobian()[0][1] * uElem->getEtaMatrix()[j][k];
 
 				dNdy[k] = jacobian->getInvertedJacobian()[1][0] * uElem->getKsiMatrix()[j][k]
 						+ jacobian->getInvertedJacobian()[1][1] * uElem->getEtaMatrix()[j][k];
-
-				tempInt += initialTemp[k] * uElem->getSVMatrix()[j][k];
+				
+				tempInt += initialTemp[k] * uElem->getSVMatrix()[k][j];
 			}
 
 				det = jacobian->getDet();
@@ -234,24 +234,34 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 				// Calka objetosciowa do H i C
 				for (int k = 0; k < 4; k++) {
 					for (int l = 0; l < 4; l++) {
+
 						// C lokalne
-						cLocal[k][l] = specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
-						// H lokalne 
-						hLocal[k][l] = lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;// +(cLocal[k][l] / tstep);
+						cLocal[k][l] += specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
+						// H lokalne
+						hLocal[k][l] += lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;
 						// P lokalnie
-						pLocal[k] += cLocal[k][l] / tstep * tempInt;
+						pLocal[k] += tempInt * cLocal[k][l] / tstep;
 					}
 				}
 			}
+
+		//TODO
+		if (i == 2) {
+			for (int a = 0; a < 4; a++) {
+				for (int b = 0; b < 4; b++) {
+					//std::cout << hLocal[a][b] <<" ";
+				}
+				//std::cout << std::endl;
+			}
+		}
 		
 
 		//Calka powierzchniowa do H i wektor P
 		for (int n_surf = 0; n_surf < localElement->getEdgeCount(); n_surf++) {
-
+			
 			//FIXME 
 			uint surface_id = localElement->getEdgeList()[n_surf];
 			double edge_length, surf_det, x_cords[4], y_cords[4], shape_func[4], ksi, eta;
-
 			// Wspolrzedne elementu skonczonego
 			for (int cords = 0; cords < 4; cords++) {
 				x_cords[cords] = localElement->getNode(cords).getX();
@@ -287,74 +297,82 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						// mala zlozonosc cyklomatyczna
 						if (surface_id == 1) {
 							if (i_point == 0) {
-								eta = -1. / sqrt(3);
-								ksi = -1;
+								ksi = -1. / sqrt(3);
+								eta = -1;
 							}
 							else {
-								eta = 1. / sqrt(3);
-								ksi = -1;
+								ksi =  1. / sqrt(3);
+								eta =  -1;
 							}
 							// N1 + N2
-							shape_func[0] = 0.25 * (1 - eta) * (1 - ksi);
-							shape_func[1] = 0.25 * (1 + eta) * (1 - ksi);
+							shape_func[0] = 0.25 * (1 - ksi) * (1 - eta);
+							shape_func[1] = 0.25 * (1 + ksi) * (1 - eta);
 							shape_func[2] = 0.;
 							shape_func[3] = 0.;
 						}
 						else if (surface_id == 2) {
 							if (i_point == 0) {
-								eta = 1;
-								ksi = -1. / sqrt(3);
+								ksi =  1;
+								eta = -1. / sqrt(3);
 							}
 							else {
-								eta = 1;
-								ksi = 1. / sqrt(3);
+								ksi = 1;
+								eta = 1. / sqrt(3);
 							}
 							// N2 + //N3
 							shape_func[0] = 0.;
-							shape_func[1] = 0.25 * (1 + eta) * (1 - ksi);
-							shape_func[2] = 0.25 * (1 + eta) * (1 + ksi);
+							shape_func[1] = 0.25 * (1 + ksi) * (1 - eta);
+							shape_func[2] = 0.25 * (1 + ksi) * (1 + eta);
 							shape_func[3] = 0.;
 
 						}
 						else if (surface_id == 3) {
 							if (i_point == 0) {
-								eta = 1. / sqrt(3);
-								ksi = 1;
+								ksi = 1. / sqrt(3);
+								eta = 1;
 							}
 							else {
-								eta = -1. / sqrt(3);
-								ksi = 1;
+								ksi = -1. / sqrt(3);
+								eta = 1;
 							}
 							// N3 + //N4
 							shape_func[0] = 0.;
 							shape_func[1] = 0.;
-							shape_func[2] = 0.25 * (1 + eta) * (1 + ksi);
-							shape_func[3] = 0.25 * (1 - eta) * (1 + ksi);
+							shape_func[2] = 0.25 * (1 + ksi) * (1 + eta);
+							shape_func[3] = 0.25 * (1 - ksi) * (1 + eta);
 						}
 						else {
 							if (i_point == 0) {
-								eta = -1;
-								ksi = 1. / sqrt(3);
+								ksi = -1;
+								eta = 1. / sqrt(3);
 							}
 							else {
-								eta = -1;
-								ksi = -1. / sqrt(3);
+								ksi = -1;
+								eta = -1. / sqrt(3);
 							}
 							// N4 + N1
-							shape_func[3] = 0.25 * (1 - eta) * (1 + ksi);
+							shape_func[0] = 0.25 * (1 - ksi) * (1 - eta);
 							shape_func[1] = 0.;
 							shape_func[2] = 0.;
-							shape_func[0] = 0.25 * (1 - eta) * (1 - ksi);
+							shape_func[3] = 0.25 * (1 - ksi) * (1 + eta);
 						}
 
 						// Macierz H po powierzchni
 						hLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;
 					}
-					pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient;
+					if (i == 2) {
+						//std::cout << shape_func[j] << std::endl;
+					}
+					pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient*det;
 				}
 			}
 		}
 
+		if (i == 2) {
+			for (int ia = 0; ia < 4; ia++) {
+				//std::cout << pLocal[ia] << std::endl;
+			}
+		}
 
 		// Agregacja
 		for (int a = 0; a < 4; a++) {
@@ -386,7 +404,7 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 
 	if (print_global_arrays == true) {
 		std::cout << std::setprecision(2);
-		std::cout << "MACIERZ H" << std::endl;
+		std::cout << "MACIERZ H+C" << std::endl;
 		for (int a = 0; a < 16; a++) {
 			for (int b = 0; b < 16; b++) {
 				printf("%.3f ", this->hGlobal[a][b]);
@@ -408,5 +426,6 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 		}
 		std::cout << std::endl;
 	}
+
 }
 

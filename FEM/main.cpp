@@ -23,7 +23,7 @@ int main()
 	grid->compute(data.getNH(), data.getNW(), data.getSC(), data.getDensity(), data.getLambda(), data.getTimeStep(), data.getMConv(), data.getAmbientT());
 
 	
-	
+	/*
 	// Czas procesu
 	double process_time = data.getProcessTime();
 	// Krok czasowy
@@ -70,7 +70,7 @@ int main()
 
 		iterator++;
 	}
-	
+	*/
 	
 
 

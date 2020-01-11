@@ -39,14 +39,14 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 	this->pc[0].eta = -a;
 	this->pc[0].ksi = -a;
 
-	this->pc[1].eta =  a;
-	this->pc[1].ksi = -a;
+	this->pc[1].eta = -a;
+	this->pc[1].ksi =  a;
 
 	this->pc[2].eta = a;
 	this->pc[2].ksi = a;
 
-	this->pc[3].eta = -a;
-	this->pc[3].ksi = a;
+	this->pc[3].eta =  a;
+	this->pc[3].ksi = -a;
 
 	
 	/*hardcoded*/
@@ -61,17 +61,17 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 		this->eta_array[i][0] = -0.25 * (1 - ksi);
 		this->ksi_array[i][0] = -0.25 * (1 - eta);
 
-		this->shape_vals[i][1] = 0.25 * (1 + eta) * (1 - ksi);
-		this->eta_array[i][1] =  0.25 * (1 - ksi);
-		this->ksi_array[i][1] = -0.25 * (1 + eta);
+		this->shape_vals[i][3] = 0.25 * (1 + eta) * (1 - ksi);
+		this->eta_array[i][3] =  0.25 * (1 - ksi);
+		this->ksi_array[i][3] = -0.25 * (1 + eta);
 
 		this->shape_vals[i][2] = 0.25 * (1 + eta) * (1 + ksi);
 		this->eta_array[i][2] = 0.25 * (1 + ksi);
 		this->ksi_array[i][2] = 0.25 * (1 + eta);
 
-		this->shape_vals[i][3] = 0.25 * (1 - eta) * (1 + ksi);
-		this->eta_array[i][3] = -0.25 * (1 + ksi);
-		this->ksi_array[i][3] = 0.25 * (1 - eta);
+		this->shape_vals[i][1] = 0.25 * (1 - eta) * (1 + ksi);
+		this->eta_array[i][1] = -0.25 * (1 + ksi);
+		this->ksi_array[i][1] =  0.25 * (1 - eta);
 		
 	}
 }
