@@ -239,21 +239,23 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						cLocal[k][l] += specificHeat * density * uElem->getSVMatrix()[j][k] * uElem->getSVMatrix()[j][l] * det;
 						// H lokalne
 						hLocal[k][l] += lambda * (dNdx[k] * dNdx[l] + dNdy[k] * dNdy[l]) * det;
-						// P lokalnie
-						pLocal[k] += tempInt * cLocal[k][l] / tstep;
+						// Pc lokalnie
+						pLocal[k] += (specificHeat * density * uElem->getSVMatrix()[j][k]* uElem->getSVMatrix()[j][l] *det) / tstep * tempInt;
+					}
+
+				}
+
+				for (int k = 0; k < 4; k++) {
+					for (int l = 0; l < 4; l++) {
+						if (i == 2 && k == 0 && l == 0) {
+							//std::cout << pLocal[k] << std::endl;
+						}
 					}
 				}
-			}
 
-		//TODO
-		if (i == 2) {
-			for (int a = 0; a < 4; a++) {
-				for (int b = 0; b < 4; b++) {
-					//std::cout << hLocal[a][b] <<" ";
-				}
-				//std::cout << std::endl;
+
+
 			}
-		}
 		
 
 		//Calka powierzchniowa do H i wektor P
@@ -360,10 +362,7 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 						// Macierz H po powierzchni
 						hLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;
 					}
-					if (i == 2) {
-						//std::cout << shape_func[j] << std::endl;
-					}
-					pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient*det;
+						pLocal[j] += alfa * shape_func[j] * surf_det * t_ambient;
 				}
 			}
 		}
@@ -402,7 +401,7 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 
 	// Wypisywanie tablic
 
-	if (print_global_arrays == true) {
+	if (display_global_matrixes == true) {
 		std::cout << std::setprecision(2);
 		std::cout << "MACIERZ H+C" << std::endl;
 		for (int a = 0; a < 16; a++) {

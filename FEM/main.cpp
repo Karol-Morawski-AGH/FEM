@@ -18,12 +18,12 @@ GlobalData data(std::stod(input[0][0]), std::stod(input[1][0]), std::stoul(input
 int main()
 {
 	//data.print();
-
+	
 	Grid* grid = new Grid(data);
 	grid->compute(data.getNH(), data.getNW(), data.getSC(), data.getDensity(), data.getLambda(), data.getTimeStep(), data.getMConv(), data.getAmbientT());
 
 	
-	/*
+	
 	// Czas procesu
 	double process_time = data.getProcessTime();
 	// Krok czasowy
@@ -47,7 +47,7 @@ int main()
 			nodes[j]->setTemp(temp[j]);
 		}
 
-		// Printing temp values of each node on the grid
+		// Temp values of each node on the grid
 		uint order_tracker = 0;
 		std::vector<double> local_temp;
 
@@ -55,10 +55,16 @@ int main()
 		for (int k = 0; k < data.getNH(); k++) {
 			for (int l = 0; l < data.getNW(); l++) {
 				local_temp.push_back(nodes[order_tracker]->getTemp());
-				std::cout << local_temp[order_tracker] << " ";
+
+				// Displaying grid
+				if (display_grid == true) {
+					std::cout << local_temp[order_tracker] << " ";
+				}
 				order_tracker++;
 			}
-			std::cout << std::endl;
+			if (display_grid == true) {
+				std::cout << std::endl;
+			}
 		}
 
 		// Find and print Tmax and Tmin
@@ -70,7 +76,7 @@ int main()
 
 		iterator++;
 	}
-	*/
+
 	
 
 
