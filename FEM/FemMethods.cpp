@@ -94,62 +94,6 @@ std::vector<std::vector<double>> doubleVector(std::vector<std::vector<std::strin
 	return casted;
 }
 
-double gauss_quad(double a, double b, int precision, double(*fun)(double))
-{
-	double c = -1;
-	double d = 1;
-
-	//mapowanie na przedzial
-	double alfa = (b - a) / (d - c);
-	double beta = (a * d - b * c) / (d - c);
-
-	double table[4][4];
-
-	//FIXME
-	//TODO cos tu zrobic
-	std::vector<double> x = { -0.577350, 0.577350, -0.774597, 0, 0.774597, -0.861136, -0.339981, 0.339981,  0.861136, -0.906180, -0.538469, 0, 0.538469, 0.906180 };
-	std::vector<double> A = { 1, 1, 0.555555, 0.888888, 0.555555,0.347855, 0.652145, 0.652145, 0.347855, 0.236927, 0.478629, 0.568889, 0.478629, 0.236927 };
-
-	for (int i = 0; i < 14; i++) {
-		A[i] = A[i] * alfa;
-		x[i] = (x[i] * alfa) + beta;
-	}
-
-	double result = 0.0;
-
-
-	if (precision == 1) {
-		//n=1
-		for (int i = 0; i <= 1; i++) {
-			result = result + A[i] * fun(x[i]);
-		}
-	}
-	else if (precision == 2) {
-		//n=2
-		for (int i = 2; i <= 4; i++) {
-			result = result + A[i] * fun(x[i]);
-		}
-	}
-	else if (precision == 3) {
-		//n=3
-		for (int i = 5; i <= 8; i++) {
-			result = result + A[i] * fun(x[i]);
-		}
-	}
-	else if (precision == 4) {
-		//n=4
-		for (int i = 9; i <= 13; i++) {
-			result = result + A[i] * fun(x[i]);
-		}
-	}
-	else
-	{
-		std::cout << "WARNING: Precision must be: in range <1,4>" << std::endl;
-	}
-
-	return result;
-}
-
 // Gaussian Elimination
 std::vector<double> gaussianElimination(std::vector<std::vector<double>> A, std::vector<double> B)
 {
@@ -174,7 +118,7 @@ std::vector<double> gaussianElimination(std::vector<std::vector<double>> A, std:
 				matrix[k][j] = matrix[k][j] - t * matrix[i][j];
 		}
 
-	//Calculating result vector
+	//Calculating results vector
 	std::vector<double> results;
 
 	for (int i = 0; i < n; i++) {

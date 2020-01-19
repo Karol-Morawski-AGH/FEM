@@ -245,16 +245,7 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 
 				}
 
-				for (int k = 0; k < 4; k++) {
-					for (int l = 0; l < 4; l++) {
-						if (i == 2 && k == 0 && l == 0) {
-							//std::cout << pLocal[k] << std::endl;
-						}
-					}
-				}
-
-
-
+				delete jacobian;
 			}
 		
 

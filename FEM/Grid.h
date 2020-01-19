@@ -13,8 +13,6 @@ class Grid
 {
 	std::vector<Node*> nodes;
 	std::vector<Element*> elements;
-	std::vector<double> globalP;
-	std::vector<double> globalH;
 
 	std::vector<double> pGlobal;
 	std::vector<std::vector<double>> hGlobal;

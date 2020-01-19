@@ -9,9 +9,6 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 	/*Siatka MES i tak tworzy tylko elementy 4-wezlowe wiec*/
 	/*macierz 4(liczba wezlow, a wiec liczba f ksztaltu)x4(liczba punktow calkowania)*/
 	
-	//std::cout << "Universal element init" << std::endl;
-
-
 	/*Tworzenie tablic pochodnych po ksi i eta dla pkt calkowania*/
 	this->ksi_array = new double* [this->node_q];
 	this->eta_array = new double* [this->node_q];
