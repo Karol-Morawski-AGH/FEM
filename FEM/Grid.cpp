@@ -244,7 +244,6 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 					}
 
 				}
-
 				delete jacobian;
 			}
 		
@@ -287,68 +286,10 @@ void Grid::compute(int nH, int nW, double specificHeat, double density, double l
 				for (int j = 0; j < 4; j++) {
 					for (int k = 0; k < 4; k++) {
 
-						// mala zlozonosc cyklomatyczna
-						if (surface_id == 1) {
-							if (i_point == 0) {
-								ksi = -1. / sqrt(3);
-								eta = -1;
-							}
-							else {
-								ksi =  1. / sqrt(3);
-								eta =  -1;
-							}
-							// N1 + N2
-							shape_func[0] = 0.25 * (1 - ksi) * (1 - eta);
-							shape_func[1] = 0.25 * (1 + ksi) * (1 - eta);
-							shape_func[2] = 0.;
-							shape_func[3] = 0.;
-						}
-						else if (surface_id == 2) {
-							if (i_point == 0) {
-								ksi =  1;
-								eta = -1. / sqrt(3);
-							}
-							else {
-								ksi = 1;
-								eta = 1. / sqrt(3);
-							}
-							// N2 + //N3
-							shape_func[0] = 0.;
-							shape_func[1] = 0.25 * (1 + ksi) * (1 - eta);
-							shape_func[2] = 0.25 * (1 + ksi) * (1 + eta);
-							shape_func[3] = 0.;
-
-						}
-						else if (surface_id == 3) {
-							if (i_point == 0) {
-								ksi = 1. / sqrt(3);
-								eta = 1;
-							}
-							else {
-								ksi = -1. / sqrt(3);
-								eta = 1;
-							}
-							// N3 + //N4
-							shape_func[0] = 0.;
-							shape_func[1] = 0.;
-							shape_func[2] = 0.25 * (1 + ksi) * (1 + eta);
-							shape_func[3] = 0.25 * (1 - ksi) * (1 + eta);
-						}
-						else {
-							if (i_point == 0) {
-								ksi = -1;
-								eta = 1. / sqrt(3);
-							}
-							else {
-								ksi = -1;
-								eta = -1. / sqrt(3);
-							}
-							// N4 + N1
-							shape_func[0] = 0.25 * (1 - ksi) * (1 - eta);
-							shape_func[1] = 0.;
-							shape_func[2] = 0.;
-							shape_func[3] = 0.25 * (1 - ksi) * (1 + eta);
-						}
+						shape_func[0] = uElem->getSSVMatrix()[surface_id-1][i_point][0];
+						shape_func[1] = uElem->getSSVMatrix()[surface_id - 1][i_point][1];
+						shape_func[2] = uElem->getSSVMatrix()[surface_id - 1][i_point][2];
+						shape_func[3] = uElem->getSSVMatrix()[surface_id - 1][i_point][3];
 
 						// Macierz H po powierzchni
 						hLocal[j][k] += alfa * shape_func[j] * shape_func[k] * surf_det;

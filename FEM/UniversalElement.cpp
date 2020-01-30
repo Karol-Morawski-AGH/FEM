@@ -13,6 +13,7 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 	this->ksi_array = new double* [this->node_q];
 	this->eta_array = new double* [this->node_q];
 	this->shape_vals = new double* [this->node_q];
+	this->surface_shape_vals = new double** [4];
 
 	for (uint i = 0; i < this->node_q; i++) {
 		this->eta_array[i] = new double[this->ipoint_q];
@@ -20,8 +21,17 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 		this->shape_vals[i] = new double[this->ipoint_q];
 	}
 
+	for (uint i = 0; i < 4; i++) {
+		this->surface_shape_vals[i] = new double* [2];
+		for (uint j = 0; j < 2; j++) {
+			this->surface_shape_vals[i][j] = new double [4];
+		}
+	}
+
 	this->pc = new IntegrationPoint[this->ipoint_q];
 	this->pc_w = new double[this->ipoint_q];
+
+	
 	
 	/*Przy zalozeniu ze calkowanie dwupunktowe
 	a=1/sqrt(3)
@@ -71,6 +81,74 @@ UniversalElement::UniversalElement(uint nodeq, uint ipoint)
 		this->ksi_array[i][1] =  0.25 * (1 - eta);
 		
 	}
+
+
+	// nr boku // punkt calkowania // nr funkcji ksztaltu	
+
+	// bok 1
+	// PC 1
+	ksi = -1. / sqrt(3);
+	eta = -1;
+	this->surface_shape_vals[0][0][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[0][0][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[0][0][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[0][0][3] = 0.25 * (1 - ksi) * (1 + eta);
+	// PC2
+	ksi = 1. / sqrt(3);
+	eta = -1;
+	this->surface_shape_vals[0][1][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[0][1][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[0][1][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[0][1][3] = 0.25 * (1 - ksi) * (1 + eta);
+
+	// bok 2
+	//PC1
+	ksi = 1;
+	eta = -1. / sqrt(3);
+	this->surface_shape_vals[1][0][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[1][0][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[1][0][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[1][0][3] = 0.25 * (1 - ksi) * (1 + eta);
+	//PC2
+	ksi = 1;
+	eta = 1. / sqrt(3);
+	this->surface_shape_vals[1][1][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[1][1][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[1][1][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[1][1][3] = 0.25 * (1 - ksi) * (1 + eta);
+	// bok 3
+	//PC1
+	ksi = 1. / sqrt(3);
+	eta = 1;
+	this->surface_shape_vals[2][0][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[2][0][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[2][0][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[2][0][3] = 0.25 * (1 - ksi) * (1 + eta);
+	//PC2
+	ksi = -1. / sqrt(3);
+	eta = 1;
+	this->surface_shape_vals[2][1][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[2][1][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[2][1][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[2][1][3] = 0.25 * (1 - ksi) * (1 + eta);
+	// bok 4
+	//PC1
+	ksi = -1;
+	eta = 1. / sqrt(3);
+	this->surface_shape_vals[3][0][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[3][0][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[3][0][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[3][0][3] = 0.25 * (1 - ksi) * (1 + eta);
+	//PC2
+	ksi = -1;
+	eta = -1. / sqrt(3);
+	this->surface_shape_vals[3][1][0] = 0.25 * (1 - ksi) * (1 - eta);
+	this->surface_shape_vals[3][1][1] = 0.25 * (1 + ksi) * (1 - eta);
+	this->surface_shape_vals[3][1][2] = 0.25 * (1 + ksi) * (1 + eta);
+	this->surface_shape_vals[3][1][3] = 0.25 * (1 - ksi) * (1 + eta);
+
+
+
 }
 
 void UniversalElement::print()

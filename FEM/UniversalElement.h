@@ -12,9 +12,10 @@ class UniversalElement
 	double** eta_array;							/*Values of the partial shape functions with respect to eta*/
 
 	double ** shape_vals;						/*Values of shape functions*/
+	double *** surface_shape_vals;				
 
 	IntegrationPoint* pc;						/*Integration points*/
-	double* pc_w;					/*Wagi tego u góry*/
+	double* pc_w;								/*Wagi tego u góry*/
 
 public:
 	UniversalElement(uint nodeq, uint ipoint);
@@ -23,5 +24,6 @@ public:
 	/*Getters and setters*/
 	double** getKsiMatrix() { return ksi_array; }
 	double** getEtaMatrix() { return eta_array; }
-	double** getSVMatrix()  {  return  shape_vals; }
+	double** getSVMatrix()  { return  shape_vals; }
+	double*** getSSVMatrix() { return surface_shape_vals; }
 };
